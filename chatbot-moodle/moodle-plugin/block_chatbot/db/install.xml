@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/chatbot/db" VERSION="20260520" COMMENT="Chatbot academic support tables">
+  <TABLES>
+    <TABLE NAME="block_chatbot_messages" COMMENT="Mensajes de chat por usuario">
+      <FIELDS>
+        <FIELD NAME="id"        TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="user_id"   TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="role"      TYPE="char" LENGTH="16" NOTNULL="true"/>
+        <FIELD NAME="content"   TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="subject"   TYPE="char" LENGTH="64" NOTNULL="false"/>
+        <FIELD NAME="timestamp" TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_user" UNIQUE="false" FIELDS="user_id"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="block_chatbot_exercises" COMMENT="Ejercicios por usuario">
+      <FIELDS>
+        <FIELD NAME="id"        TYPE="int"  LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="user_id"   TYPE="int"  LENGTH="10" NOTNULL="true"/>
+        <FIELD NAME="question"  TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="answer"    TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="correct"   TYPE="int"  LENGTH="1"  NOTNULL="false"/>
+        <FIELD NAME="timestamp" TYPE="int"  LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_user" UNIQUE="false" FIELDS="user_id"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="block_chatbot_progress" COMMENT="Progreso por usuario y materia">
+      <FIELDS>
+        <FIELD NAME="id"        TYPE="int"  LENGTH="10"  NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="user_id"   TYPE="int"  LENGTH="10"  NOTNULL="true"/>
+        <FIELD NAME="subject"   TYPE="char" LENGTH="64"  NOTNULL="true"/>
+        <FIELD NAME="topic"     TYPE="char" LENGTH="128" NOTNULL="true"/>
+        <FIELD NAME="count"     TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="1"/>
+        <FIELD NAME="last_seen" TYPE="int"  LENGTH="10"  NOTNULL="true" DEFAULT="0"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="idx_user_subject" UNIQUE="false" FIELDS="user_id,subject"/>
+      </INDEXES>
+    </TABLE>
+  </TABLES>
+</XMLDB>

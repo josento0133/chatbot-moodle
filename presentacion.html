@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatbot Académico Moodle</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    height: 100vh;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  .deck {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    transform: translateX(60px);
+    transition: opacity .4s ease, transform .4s ease;
+    pointer-events: none;
+    text-align: center;
+  }
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+
+  /* ── Backgrounds ───────────────────────────────── */
+  .bg-hero    { background: linear-gradient(135deg, #1a1f35 0%, #0d3349 100%); }
+  .bg-dark    { background: #12161f; }
+  .bg-blue    { background: linear-gradient(135deg, #0d2b4e 0%, #163a5f 100%); }
+  .bg-green   { background: linear-gradient(135deg, #0d3322 0%, #1a4a30 100%); }
+  .bg-purple  { background: linear-gradient(135deg, #1e0d3d 0%, #2d1559 100%); }
+  .bg-orange  { background: linear-gradient(135deg, #3d1c0d 0%, #5c2a10 100%); }
+
+  /* ── Typography ────────────────────────────────── */
+  .tag {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: #60a5fa;
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px;
+  }
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 28px;
+  }
+  .subtitle {
+    font-size: 1.15rem;
+    color: #94a3b8;
+    max-width: 620px;
+    line-height: 1.7;
+  }
+  .lead {
+    font-size: 1.25rem;
+    color: #cbd5e1;
+    max-width: 700px;
+    line-height: 1.75;
+    margin-bottom: 24px;
+  }
+
+  /* ── Cards grid ────────────────────────────────── */
+  .grid {
+    display: grid;
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 8px;
+  }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+  .card {
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-align: left;
+  }
+  .card .icon {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .card h3 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .card p, .card li {
+    font-size: .82rem;
+    color: #94a3b8;
+    line-height: 1.6;
+  }
+  .card ul { padding-left: 16px; }
+
+  /* ── Badge pills ───────────────────────────────── */
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 16px;
+    max-width: 800px;
+  }
+  .pill {
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .pill-blue   { background: rgba(96,165,250,.15);  border-color: #60a5fa; color: #93c5fd; }
+  .pill-purple { background: rgba(167,139,250,.15); border-color: #a78bfa; color: #c4b5fd; }
+  .pill-green  { background: rgba(52,211,153,.15);  border-color: #34d399; color: #6ee7b7; }
+  .pill-orange { background: rgba(251,146,60,.15);  border-color: #fb923c; color: #fdba74; }
+  .pill-red    { background: rgba(248,113,113,.15); border-color: #f87171; color: #fca5a5; }
+
+  /* ── Architecture diagram ──────────────────────── */
+  .arch {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .arch-box {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: .82rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 110px;
+  }
+  .arch-box small {
+    display: block;
+    font-weight: 400;
+    color: #64748b;
+    font-size: .72rem;
+    margin-top: 3px;
+  }
+  .arch-arrow {
+    font-size: 1.2rem;
+    color: #475569;
+  }
+
+  /* ── Code block ────────────────────────────────── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid #21262d;
+    border-radius: 10px;
+    padding: 18px 22px;
+    text-align: left;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: .78rem;
+    line-height: 1.7;
+    color: #e2e8f0;
+    width: 100%;
+    max-width: 820px;
+    overflow-x: auto;
+  }
+  .code-block .kw  { color: #ff7b72; }
+  .code-block .fn  { color: #d2a8ff; }
+  .code-block .str { color: #a5d6ff; }
+  .code-block .cm  { color: #8b949e; }
+  .code-block .num { color: #79c0ff; }
+
+  /* ── Stat numbers ──────────────────────────────── */
+  .stat-row {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat .num {
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+  .stat .lbl {
+    font-size: .78rem;
+    color: #64748b;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  /* ── Timeline / steps ──────────────────────────── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 700px;
+    text-align: left;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-body h4 {
+    font-size: .9rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 2px;
+  }
+  .step-body p {
+    font-size: .82rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  /* ── Table ─────────────────────────────────────── */
+  .data-table {
+    width: 100%;
+    max-width: 820px;
+    border-collapse: collapse;
+    font-size: .82rem;
+    text-align: left;
+  }
+  .data-table th {
+    background: rgba(96,165,250,.15);
+    color: #93c5fd;
+    padding: 10px 14px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    border-bottom: 1px solid rgba(96,165,250,.3);
+  }
+  .data-table td {
+    padding: 9px 14px;
+    color: #94a3b8;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .data-table tr:hover td { background: rgba(255,255,255,.03); }
+  .method {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: .7rem;
+    font-weight: 700;
+  }
+  .get  { background: rgba(52,211,153,.2); color: #34d399; }
+  .post { background: rgba(96,165,250,.2); color: #60a5fa; }
+
+  /* ── Navigation ────────────────────────────────── */
+  .nav {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 100;
+  }
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.08);
+    color: #e2e8f0;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,.18); }
+  .nav-btn:disabled { opacity: .3; cursor: default; }
+
+  .dots {
+    display: flex;
+    gap: 6px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.2);
+    cursor: pointer;
+    transition: background .2s, transform .2s;
+  }
+  .dot.active {
+    background: #60a5fa;
+    transform: scale(1.3);
+  }
+
+  .slide-counter {
+    position: fixed;
+    top: 20px;
+    right: 28px;
+    font-size: .75rem;
+    color: #475569;
+    font-weight: 600;
+    z-index: 100;
+  }
+
+  /* ── Divider line ──────────────────────────────── */
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    border-radius: 2px;
+    margin: 0 auto 24px;
+  }
+
+  /* ── Responsive ────────────────────────────────── */
+  @media (max-width: 700px) {
+    .slide { padding: 40px 24px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.4rem; }
+    .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ① PORTADA -->
+  <div class="slide bg-hero active">
+    <div class="tag">Proyecto Final · 2026</div>
+    <h1>Chatbot Académico<br>para Moodle</h1>
+    <p class="subtitle">Asistente inteligente integrado en la plataforma Moodle para apoyo académico en Bachillerato (16-18 años), con LLM local, historial por usuario y seguimiento de progreso.</p>
+    <div class="pills" style="margin-top:32px">
+      <span class="pill pill-blue">FastAPI · Python 3.11</span>
+      <span class="pill pill-purple">Moodle Plugin PHP 8</span>
+      <span class="pill pill-green">Ollama · Llama3 / Mistral</span>
+      <span class="pill pill-orange">JWT HS256</span>
+      <span class="pill pill-red">28 tests · 100% pass</span>
+    </div>
+  </div>
+
+  <!-- ② PROBLEMA -->
+  <div class="slide bg-dark">
+    <div class="tag">El problema</div>
+    <h2>¿Qué necesidad resuelve?</h2>
+    <div class="divider"></div>
+    <div class="grid grid-2" style="max-width:800px">
+      <div class="card">
+        <span class="icon">🎓</span>
+        <h3>Alumnos de Bachillerato</h3>
+        <p>Necesitan resolver dudas académicas fuera del horario lectivo sin esperar al día siguiente.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔗</span>
+        <h3>Integración con Moodle</h3>
+        <p>Los alumnos ya usan Moodle. El asistente debe vivir ahí, sin apps externas ni nuevos logins.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔒</span>
+        <h3>Privacidad de datos</h3>
+        <p>El modelo corre en local (Ollama). Ningún dato del alumno sale del servidor del centro.</p>
+      </div>
+      <div class="card">
+        <span class="icon">📈</span>
+        <h3>Seguimiento pedagógico</h3>
+        <p>Los profesores quieren datos reales: qué materias generan más dudas, tasa de acierto en ejercicios.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ③ ARQUITECTURA -->
+  <div class="slide bg-blue">
+    <div class="tag">Arquitectura</div>
+    <h2>Visión general del sistema</h2>
+    <div class="divider"></div>
+    <div class="arch">
+      <div class="arch-box" style="border-color:#60a5fa44">
+        🧑‍🎓 Alumno
+        <small>Navegador web</small>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="border-color:#a78bfa44">
+        🧩 Moodle Block
+        <small>PHP 8 · AMD JS</small>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="border-color:#34d39944">
+        ⚡ FastAPI
+        <small>Python 3.11</small>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="border-color:#fb923c44">
+        🤖 Ollama
+        <small>Llama3 / Mistral</small>
+      </div>
+    </div>
+    <div class="arch" style="margin-top:12px">
+      <div class="arch-box" style="border-color:#f8717144; width:260px">
+        🗄️ Base de datos
+        <small>SQLite (dev) · MySQL / MariaDB (prod)</small>
+      </div>
+      <div class="arch-box" style="border-color:#60a5fa44; width:260px">
+        🔑 JWT HS256
+        <small>Generado en PHP · Verificado en Python</small>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top:20px">El bloque Moodle autentica al usuario y genera un token JWT. El frontend AMD envía ese token a FastAPI en cada petición. FastAPI verifica el token, gestiona la lógica y consulta al LLM local.</p>
+  </div>
+
+  <!-- ④ STACK TECNOLÓGICO -->
+  <div class="slide bg-dark">
+    <div class="tag">Stack tecnológico</div>
+    <h2>Tecnologías utilizadas</h2>
+    <div class="divider"></div>
+    <div class="grid grid-3" style="max-width:870px">
+      <div class="card">
+        <span class="icon">🐍</span>
+        <h3>Backend</h3>
+        <ul>
+          <li>FastAPI 0.110</li>
+          <li>SQLAlchemy 2.0</li>
+          <li>PyJWT</li>
+          <li>httpx (async)</li>
+          <li>pydantic-settings</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">🧩</span>
+        <h3>Plugin Moodle</h3>
+        <ul>
+          <li>PHP 8.x · block_base</li>
+          <li>AMD JS (RequireJS)</li>
+          <li>Mustache templates</li>
+          <li>install.xml (XMLDB)</li>
+          <li>PHPUnit</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">🤖</span>
+        <h3>LLM Local</h3>
+        <ul>
+          <li>Ollama 0.1.x</li>
+          <li>Llama 3 · Mistral</li>
+          <li>API REST local</li>
+          <li>Sin GPU requerida</li>
+          <li>100% on-premise</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">🗄️</span>
+        <h3>Base de datos</h3>
+        <ul>
+          <li>SQLite (desarrollo)</li>
+          <li>MySQL / MariaDB (prod)</li>
+          <li>3 tablas propias</li>
+          <li>Índices por user_id</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">🐳</span>
+        <h3>Infraestructura</h3>
+        <ul>
+          <li>Docker Compose</li>
+          <li>bitnami/moodle:4</li>
+          <li>MySQL 8 container</li>
+          <li>uvicorn ASGI server</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">✅</span>
+        <h3>Testing</h3>
+        <ul>
+          <li>pytest + pytest-asyncio</li>
+          <li>28 tests Python</li>
+          <li>PHPUnit Moodle</li>
+          <li>AsyncMock (Ollama)</li>
+          <li>SQLite in-memory</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ FUNCIONALIDADES -->
+  <div class="slide bg-green">
+    <div class="tag">Funcionalidades</div>
+    <h2>¿Qué puede hacer el asistente?</h2>
+    <div class="divider"></div>
+    <div class="grid grid-2" style="max-width:820px">
+      <div class="card">
+        <span class="icon">💬</span>
+        <h3>Chat de dudas</h3>
+        <p>El alumno escribe su pregunta y recibe una respuesta adaptada a Bachillerato en segundos. El historial persiste entre sesiones (últimos 10 mensajes de contexto).</p>
+      </div>
+      <div class="card">
+        <span class="icon">📝</span>
+        <h3>Ejercicios prácticos</h3>
+        <p>Para Matemáticas, Física, Química y Biología, el asistente genera un ejercicio con pregunta estructurada. El alumno responde y recibe corrección + explicación.</p>
+      </div>
+      <div class="card">
+        <span class="icon">📊</span>
+        <h3>Seguimiento de progreso</h3>
+        <p>Panel con: mensajes enviados hoy, total de ejercicios, % de acierto, y desglose por materia (temas más consultados).</p>
+      </div>
+      <div class="card">
+        <span class="icon">🛡️</span>
+        <h3>Límite diario</h3>
+        <p>Máximo 50 mensajes por usuario al día (configurable). Evita abuso y garantiza recursos disponibles para todos los alumnos.</p>
+      </div>
+    </div>
+    <div class="pills" style="margin-top:20px">
+      <span class="pill pill-blue">Matemáticas</span>
+      <span class="pill pill-purple">Física</span>
+      <span class="pill pill-green">Química</span>
+      <span class="pill pill-orange">Biología</span>
+      <span class="pill pill-red">Lengua · Literatura</span>
+      <span class="pill pill-blue">Historia · Inglés</span>
+      <span class="pill pill-purple">Ciencias Sociales</span>
+    </div>
+  </div>
+
+  <!-- ⑥ BASE DE DATOS -->
+  <div class="slide bg-dark">
+    <div class="tag">Base de datos</div>
+    <h2>Tres tablas en Moodle</h2>
+    <div class="divider"></div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Tabla</th>
+          <th>Campos principales</th>
+          <th>Propósito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:#f1f5f9">block_chatbot_messages</strong></td>
+          <td>user_id · role · content · subject · timestamp</td>
+          <td>Historial de conversación por usuario</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#f1f5f9">block_chatbot_exercises</strong></td>
+          <td>user_id · question · answer · correct · timestamp</td>
+          <td>Ejercicios generados y respuestas del alumno</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#f1f5f9">block_chatbot_progress</strong></td>
+          <td>user_id · subject · topic · count · last_seen</td>
+          <td>Temas más consultados por materia</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="subtitle" style="margin-top:24px">Las tablas se instalan automáticamente vía <strong style="color:#60a5fa">install.xml</strong> (XMLDB) al añadir el plugin. El motor de base de datos lo hereda Moodle: SQLite en dev, MySQL/MariaDB en prod.</p>
+  </div>
+
+  <!-- ⑦ API ENDPOINTS -->
+  <div class="slide bg-purple">
+    <div class="tag">API REST · FastAPI</div>
+    <h2>Endpoints del backend</h2>
+    <div class="divider"></div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Método</th><th>Ruta</th><th>Descripción</th><th>Auth</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code style="color:#a5d6ff">/chat</code></td>
+          <td>Enviar mensaje, obtener respuesta del LLM</td>
+          <td>JWT body</td>
+        </tr>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code style="color:#a5d6ff">/history/{user_id}</code></td>
+          <td>Historial de mensajes del usuario</td>
+          <td>JWT query</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code style="color:#a5d6ff">/exercise</code></td>
+          <td>Generar ejercicio para una materia</td>
+          <td>JWT body</td>
+        </tr>
+        <tr>
+          <td><span class="method post">POST</span></td>
+          <td><code style="color:#a5d6ff">/exercise/answer</code></td>
+          <td>Evaluar respuesta del alumno</td>
+          <td>JWT body</td>
+        </tr>
+        <tr>
+          <td><span class="method get">GET</span></td>
+          <td><code style="color:#a5d6ff">/progress/{user_id}</code></td>
+          <td>Estadísticas y progreso del alumno</td>
+          <td>JWT query</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="pills" style="margin-top:20px">
+      <span class="pill pill-red">401 · Token inválido</span>
+      <span class="pill pill-orange">403 · Acceso denegado</span>
+      <span class="pill pill-purple">429 · Límite diario</span>
+      <span class="pill pill-blue">503 · Ollama caído</span>
+    </div>
+  </div>
+
+  <!-- ⑧ SEGURIDAD JWT -->
+  <div class="slide bg-dark">
+    <div class="tag">Seguridad</div>
+    <h2>Autenticación JWT HS256</h2>
+    <div class="divider"></div>
+    <div class="code-block">
+<span class="cm">// PHP — Moodle genera el token en el servidor</span>
+<span class="kw">private function</span> <span class="fn">generate_jwt</span>(<span class="kw">int</span> $user_id, <span class="kw">string</span> $secret): <span class="kw">string</span> {
+  $header  = $this-><span class="fn">b64url</span>(<span class="fn">json_encode</span>(['alg'=><span class="str">'HS256'</span>, 'typ'=><span class="str">'JWT'</span>]));
+  $payload = $this-><span class="fn">b64url</span>(<span class="fn">json_encode</span>(['user_id'=>$user_id, 'exp'=><span class="fn">time</span>()+<span class="num">3600</span>]));
+  $sig     = $this-><span class="fn">b64url</span>(<span class="fn">hash_hmac</span>(<span class="str">'sha256'</span>, <span class="str">"$header.$payload"</span>, $secret, <span class="kw">true</span>));
+  <span class="kw">return</span> <span class="str">"$header.$payload.$sig"</span>;
+}
+
+<span class="cm"># Python — FastAPI verifica el token con PyJWT</span>
+<span class="kw">def</span> <span class="fn">verify_jwt</span>(token: <span class="kw">str</span>, secret: <span class="kw">str</span> = <span class="kw">None</span>) -> <span class="kw">dict</span>:
+    <span class="kw">return</span> jwt.<span class="fn">decode</span>(token, secret, algorithms=[<span class="str">"HS256"</span>])
+    </div>
+    <div class="grid grid-3" style="margin-top:16px; max-width:820px">
+      <div class="card">
+        <h3>Secreto compartido</h3>
+        <p>Configurado en Moodle admin panel. El mismo secreto en PHP y Python garantiza que solo Moodle puede generar tokens válidos.</p>
+      </div>
+      <div class="card">
+        <h3>Expiración 1 hora</h3>
+        <p>El campo <code>exp</code> en el payload invalida automáticamente el token tras 60 minutos de inactividad.</p>
+      </div>
+      <div class="card">
+        <h3>user_id en payload</h3>
+        <p>Cada endpoint verifica que el <code>user_id</code> del token coincide con el recurso solicitado. Imposible leer el historial de otro alumno.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑨ PLUGIN MOODLE -->
+  <div class="slide bg-orange">
+    <div class="tag">Plugin Moodle</div>
+    <h2>Estructura del bloque PHP</h2>
+    <div class="divider"></div>
+    <div class="grid grid-2" style="max-width:840px">
+      <div class="card">
+        <span class="icon">📁</span>
+        <h3>Archivos del plugin</h3>
+        <ul>
+          <li><code>block_chatbot.php</code> — clase principal</li>
+          <li><code>version.php</code> — metadatos</li>
+          <li><code>settings.php</code> — panel de admin</li>
+          <li><code>db/install.xml</code> — esquema BD</li>
+          <li><code>lang/en/block_chatbot.php</code></li>
+          <li><code>templates/chat.mustache</code></li>
+          <li><code>amd/src/chat.js</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">⚙️</span>
+        <h3>Configuración admin</h3>
+        <ul>
+          <li><strong>backend_url</strong> — URL de FastAPI</li>
+          <li><strong>jwt_secret</strong> — secreto compartido</li>
+          <li><strong>daily_limit</strong> — límite de mensajes</li>
+          <li>Disponible en: cursos, sitio, My Moodle</li>
+          <li>Un solo bloque por página</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">🎨</span>
+        <h3>Interfaz (Mustache + AMD)</h3>
+        <ul>
+          <li>Área de mensajes con burbujas</li>
+          <li>Input + botón Enviar</li>
+          <li>Selector de materia</li>
+          <li>Botón "Practicar ejercicio"</li>
+          <li>Panel de progreso toggle</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">🔄</span>
+        <h3>Flujo de carga</h3>
+        <ul>
+          <li>PHP genera JWT al cargar la página</li>
+          <li>Token + backendUrl → AMD module</li>
+          <li>JS maneja todo via fetch()</li>
+          <li>Sin recarga de página (SPA-like)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑩ TESTS -->
+  <div class="slide bg-dark">
+    <div class="tag">Quality Assurance</div>
+    <h2>Suite de tests</h2>
+    <div class="divider"></div>
+    <div class="stat-row" style="margin-bottom:28px">
+      <div class="stat"><div class="num">28</div><div class="lbl">tests Python</div></div>
+      <div class="stat"><div class="num">100%</div><div class="lbl">passing</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">PHPUnit tests</div></div>
+      <div class="stat"><div class="num">0</div><div class="lbl">dependencias externas</div></div>
+    </div>
+    <div class="grid grid-3" style="max-width:860px">
+      <div class="card">
+        <h3>Backend Python</h3>
+        <ul>
+          <li>test_jwt_service — 4 tests</li>
+          <li>test_rate_limit — 5 tests</li>
+          <li>test_chat — 5 tests</li>
+          <li>test_history — 4 tests</li>
+          <li>test_progress — 3 tests</li>
+          <li>test_exercise — 5 tests</li>
+          <li>test_database — 2 tests</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Plugin PHP</h3>
+        <ul>
+          <li>b64url sin padding</li>
+          <li>b64url sin + ni /</li>
+          <li>JWT en 3 partes</li>
+          <li>user_id en payload</li>
+          <li>Firma HMAC válida</li>
+          <li>applicable_formats</li>
+          <li>Guest → contenido vacío</li>
+          <li>Sin config → mensaje error</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Estrategia de test</h3>
+        <ul>
+          <li>AsyncMock para Ollama</li>
+          <li>SQLite in-memory por test</li>
+          <li>Fixture autouse para JWT secret</li>
+          <li>TestClient de FastAPI</li>
+          <li>Sin red real necesaria</li>
+          <li>ReflectionMethod para PHP privados</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑪ DESPLIEGUE -->
+  <div class="slide bg-blue">
+    <div class="tag">Despliegue</div>
+    <h2>Poner en marcha el sistema</h2>
+    <div class="divider"></div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Levantar Moodle + MySQL con Docker</h4>
+          <p><code style="color:#a5d6ff">docker compose up -d</code> — arranca Moodle 4 en localhost:8080 con MySQL 8</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Instalar el plugin en Moodle</h4>
+          <p>Copiar <code style="color:#a5d6ff">moodle-plugin/block_chatbot/</code> a <code style="color:#a5d6ff">moodle/blocks/</code> → admin → notificaciones → instalar</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Configurar en admin de Moodle</h4>
+          <p>Plugins → Bloques → Chatbot: fijar <code>backend_url</code> y <code>jwt_secret</code></p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Arrancar el backend FastAPI</h4>
+          <p><code style="color:#a5d6ff">cd backend && uvicorn main:app --reload --port 8000</code></p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <h4>Lanzar el modelo LLM</h4>
+          <p><code style="color:#a5d6ff">ollama run llama3</code> — descarga y sirve el modelo en localhost:11434</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <h4>Añadir el bloque a un curso y probar</h4>
+          <p>Modo edición → "Añadir bloque" → Chatbot Académico → ya funciona para todos los alumnos del curso</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑫ RESUMEN FINAL -->
+  <div class="slide bg-hero">
+    <div class="tag">Resumen</div>
+    <h1>Proyecto completado</h1>
+    <div class="divider"></div>
+    <div class="stat-row" style="margin-bottom:32px">
+      <div class="stat"><div class="num">13</div><div class="lbl">tareas implementadas</div></div>
+      <div class="stat"><div class="num">20+</div><div class="lbl">archivos creados</div></div>
+      <div class="stat"><div class="num">5</div><div class="lbl">endpoints REST</div></div>
+      <div class="stat"><div class="num">3</div><div class="lbl">tablas en BD</div></div>
+    </div>
+    <div class="pills">
+      <span class="pill pill-green">✓ Backend FastAPI completo</span>
+      <span class="pill pill-blue">✓ Plugin Moodle nativo</span>
+      <span class="pill pill-purple">✓ LLM local con Ollama</span>
+      <span class="pill pill-orange">✓ JWT PHP ↔ Python</span>
+      <span class="pill pill-red">✓ 28 tests · 100% pass</span>
+      <span class="pill pill-green">✓ Docker Compose listo</span>
+      <span class="pill pill-blue">✓ Rate limiting (50/día)</span>
+      <span class="pill pill-purple">✓ Progreso por alumno</span>
+      <span class="pill pill-orange">✓ Ejercicios con corrección</span>
+      <span class="pill pill-red">✓ PHPUnit plugin</span>
+    </div>
+    <p class="subtitle" style="margin-top:28px">Sistema 100% on-premise · sin coste de API · integrado en Moodle · listo para producción</p>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- ── Navigation ──────────────────────────────────── -->
+<div class="slide-counter" id="counter">1 / 12</div>
+
+<div class="nav">
+  <button class="nav-btn" id="prev" onclick="go(-1)" disabled>&#8592;</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="next" onclick="go(1)">&#8594;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total  = slides.length;
+  let   cur    = 0;
+
+  const dotsEl   = document.getElementById('dots');
+  const counter  = document.getElementById('counter');
+  const prevBtn  = document.getElementById('prev');
+  const nextBtn  = document.getElementById('next');
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => go(i - cur);
+    dotsEl.appendChild(d);
+  });
+
+  function go(delta) {
+    const next = cur + delta;
+    if (next < 0 || next >= total) return;
+
+    slides[cur].classList.remove('active');
+    slides[cur].classList.add('exit');
+    setTimeout(() => slides[cur > next ? cur : cur].classList.remove('exit'), 400);
+
+    cur = next;
+    slides[cur].classList.add('active');
+
+    dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === cur));
+    counter.textContent = (cur + 1) + ' / ' + total;
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === total - 1;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ')  go(1);
+    if (e.key === 'ArrowLeft')                    go(-1);
+  });
+
+  // Touch swipe
+  let tx = 0;
+  document.addEventListener('touchstart', e => tx = e.touches[0].clientX, {passive:true});
+  document.addEventListener('touchend',   e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
+  }, {passive:true});
+</script>
+</body>
+</html>

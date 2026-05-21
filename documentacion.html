@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Documentación — Chatbot Académico para Moodle</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --blue:   #2563eb;
+    --blue-l: #dbeafe;
+    --gray:   #6b7280;
+    --gray-l: #f9fafb;
+    --border: #e5e7eb;
+    --text:   #111827;
+    --text-s: #374151;
+    --code-bg:#f3f4f6;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: #fff;
+    line-height: 1.7;
+  }
+
+  /* ── Layout ── */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+  }
+
+  /* ── Cover ── */
+  .cover {
+    text-align: center;
+    padding: 80px 40px 60px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .cover .badge {
+    display: inline-block;
+    background: var(--blue-l);
+    color: var(--blue);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+  .cover h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .cover .subtitle {
+    font-size: 1.05rem;
+    color: var(--gray);
+    max-width: 600px;
+    margin: 0 auto 32px;
+  }
+  .cover-meta {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-size: .85rem;
+    color: var(--gray);
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  .cover-meta strong { color: var(--text-s); }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--gray-l);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 56px;
+  }
+  .toc h2 { font-size: 1rem; font-weight: 700; margin-bottom: 16px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { padding: 3px 0; }
+  .toc a  { color: var(--blue); text-decoration: none; font-size: .9rem; }
+  .toc a:hover { text-decoration: underline; }
+
+  /* ── Sections ── */
+  section { margin-bottom: 52px; }
+  section:last-child { margin-bottom: 0; }
+
+  h2.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--blue);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h2.section-title .num {
+    background: var(--blue);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 4px;
+  }
+
+  h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-s);
+    margin: 28px 0 10px;
+  }
+  h4 {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--text-s);
+    margin: 18px 0 6px;
+  }
+
+  p { margin-bottom: 14px; color: var(--text-s); }
+  p:last-child { margin-bottom: 0; }
+
+  ul, ol {
+    padding-left: 22px;
+    margin-bottom: 14px;
+    color: var(--text-s);
+  }
+  li { margin-bottom: 5px; }
+
+  /* ── Cards / boxes ── */
+  .box {
+    background: var(--gray-l);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .box-blue {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+  .box-green {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+  }
+  .box-yellow {
+    background: #fffbeb;
+    border-color: #fde68a;
+  }
+  .box h4 { margin-top: 0; color: var(--text); }
+
+  /* ── Grid ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  /* ── Code ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .82em;
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #1d4ed8;
+  }
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    line-height: 1.65;
+    padding: 20px 24px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 14px 0;
+  }
+  pre .kw  { color: #f472b6; }
+  pre .fn  { color: #a5b4fc; }
+  pre .str { color: #86efac; }
+  pre .cm  { color: #64748b; }
+  pre .num { color: #fb923c; }
+  pre .var { color: #fbbf24; }
+
+  /* ── Table ── */
+  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .88rem;
+  }
+  th {
+    background: var(--blue);
+    color: #fff;
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    font-size: .82rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-s);
+    vertical-align: top;
+  }
+  tr:hover td { background: var(--gray-l); }
+
+  /* ── Badge ── */
+  .badge-method {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: .72rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .get  { background: #dcfce7; color: #15803d; }
+  .post { background: #dbeafe; color: #1d4ed8; }
+
+  /* ── Diagram (ASCII-style) ── */
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 24px;
+    background: var(--gray-l);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 16px 0;
+  }
+  .diag-box {
+    background: #fff;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+    font-size: .82rem;
+    font-weight: 600;
+    min-width: 100px;
+  }
+  .diag-box small {
+    display: block;
+    font-weight: 400;
+    color: var(--gray);
+    font-size: .72rem;
+    margin-top: 3px;
+  }
+  .diag-arrow {
+    color: #9ca3af;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  /* ── Step list ── */
+  .steps { counter-reset: step; }
+  .step-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 18px;
+    align-items: flex-start;
+  }
+  .step-n {
+    counter-increment: step;
+    min-width: 28px;
+    height: 28px;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .step-n::before { content: counter(step); }
+  .step-body h4 { margin-top: 0; }
+  .step-body p { font-size: .88rem; margin-bottom: 0; }
+
+  /* ── File tree ── */
+  .filetree {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 20px 24px;
+    border-radius: 8px;
+    line-height: 1.8;
+    margin: 14px 0;
+  }
+  .filetree .dir  { color: #93c5fd; }
+  .filetree .file { color: #d1d5db; }
+  .filetree .note { color: #64748b; }
+
+  /* ── Print ── */
+  @media print {
+    body { font-size: 13px; }
+    .page { padding: 20px; max-width: 100%; }
+    pre, .filetree { font-size: .72rem; }
+    a { color: var(--text); }
+    .no-print { display: none; }
+  }
+
+  /* ── Print button ── */
+  .print-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37,99,235,.35);
+    transition: background .2s;
+  }
+  .print-btn:hover { background: #1d4ed8; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 36px 0; }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">Exportar PDF</button>
+
+<div class="page">
+
+  <!-- ══ PORTADA ══════════════════════════════════ -->
+  <div class="cover">
+    <div class="badge">Proyecto de Desarrollo de Aplicaciones Web</div>
+    <h1>Chatbot Académico<br>integrado en Moodle</h1>
+    <p class="subtitle">
+      Sistema de asistencia académica inteligente para estudiantes de Bachillerato,
+      implementado como plugin nativo de Moodle con backend FastAPI y modelo de lenguaje local.
+    </p>
+    <div class="cover-meta">
+      <div><strong>Autor:</strong> Jose Aguilar</div>
+      <div><strong>Fecha:</strong> Mayo 2026</div>
+      <div><strong>Tecnología principal:</strong> Python 3.11 · PHP 8 · Ollama</div>
+      <div><strong>Tests:</strong> 28 pruebas · 100% superadas</div>
+    </div>
+  </div>
+
+  <!-- ══ ÍNDICE ════════════════════════════════════ -->
+  <div class="toc">
+    <h2>Índice de contenidos</h2>
+    <ol>
+      <li><a href="#s1">Introducción y objetivos</a></li>
+      <li><a href="#s2">Arquitectura del sistema</a></li>
+      <li><a href="#s3">Backend — API REST con FastAPI</a></li>
+      <li><a href="#s4">Modelo de datos — Base de datos</a></li>
+      <li><a href="#s5">Plugin Moodle</a></li>
+      <li><a href="#s6">Seguridad y autenticación JWT</a></li>
+      <li><a href="#s7">Modelo de lenguaje — Ollama</a></li>
+      <li><a href="#s8">Plan de pruebas</a></li>
+      <li><a href="#s9">Manual de instalación</a></li>
+      <li><a href="#s10">Conclusiones</a></li>
+    </ol>
+  </div>
+
+  <!-- ══ 1. INTRODUCCIÓN ═══════════════════════════ -->
+  <section id="s1">
+    <h2 class="section-title"><span class="num">1</span>Introducción y objetivos</h2>
+
+    <h3>Contexto</h3>
+    <p>
+      Los estudiantes de Bachillerato (16-18 años) necesitan apoyo académico más allá del horario lectivo.
+      Las dudas surgen mientras estudian por la noche o el fin de semana, y esperar al día siguiente
+      para preguntar al profesor rompe el ritmo de aprendizaje.
+    </p>
+    <p>
+      Este proyecto construye un asistente de inteligencia artificial directamente integrado en Moodle,
+      la plataforma que los centros ya utilizan. El alumno no necesita registrarse en ningún servicio externo
+      ni instalar nada: el chatbot aparece como un bloque más dentro de su curso habitual.
+    </p>
+
+    <h3>Objetivos del proyecto</h3>
+    <div class="grid-2">
+      <div class="box box-blue">
+        <h4>Objetivos funcionales</h4>
+        <ul>
+          <li>Resolver dudas académicas en tiempo real mediante conversación natural</li>
+          <li>Generar ejercicios prácticos por materia con corrección automática</li>
+          <li>Registrar el progreso del alumno: consultas por materia y tasa de acierto en ejercicios</li>
+          <li>Mantener historial de conversación entre sesiones</li>
+        </ul>
+      </div>
+      <div class="box box-green">
+        <h4>Objetivos técnicos</h4>
+        <ul>
+          <li>Integración nativa como bloque Moodle (sin iframes ni servicios externos)</li>
+          <li>LLM completamente local: los datos del alumno no salen del servidor del centro</li>
+          <li>Autenticación segura reutilizando la sesión de Moodle</li>
+          <li>Suite de pruebas automatizadas con cobertura completa de la lógica de negocio</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Alcance</h3>
+    <p>
+      El sistema cubre todas las materias de Bachillerato: Matemáticas, Física, Química, Biología,
+      Lengua, Literatura, Historia, Inglés y Ciencias Sociales. Los ejercicios prácticos con corrección
+      automática se limitan a las materias de ciencias (donde la estructura de problema-solución es más
+      clara para el modelo).
+    </p>
+  </section>
+
+  <!-- ══ 2. ARQUITECTURA ═══════════════════════════ -->
+  <section id="s2">
+    <h2 class="section-title"><span class="num">2</span>Arquitectura del sistema</h2>
+
+    <p>
+      El sistema se compone de tres capas independientes que se comunican mediante HTTP y comparten
+      la identidad del usuario a través de tokens JWT.
+    </p>
+
+    <div class="diagram">
+      <div class="diag-box">🧑‍🎓 Alumno<small>Navegador web</small></div>
+      <div class="diag-arrow">→</div>
+      <div class="diag-box" style="border-color:#2563eb">🧩 Moodle<small>Plugin PHP 8 + AMD JS</small></div>
+      <div class="diag-arrow">→</div>
+      <div class="diag-box" style="border-color:#16a34a">⚡ FastAPI<small>Python 3.11 · puerto 8000</small></div>
+      <div class="diag-arrow">→</div>
+      <div class="diag-box" style="border-color:#ea580c">🤖 Ollama<small>Llama3 · puerto 11434</small></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="box">
+        <h4>Capa de presentación (Moodle)</h4>
+        <p>El plugin PHP genera el HTML del bloque y un token JWT firmado con la identidad del usuario. El módulo AMD JavaScript maneja toda la interacción sin recargar la página, enviando peticiones al backend.</p>
+      </div>
+      <div class="box">
+        <h4>Capa de negocio (FastAPI)</h4>
+        <p>Recibe las peticiones, verifica el token JWT, aplica el límite de mensajes diario, consulta el historial, llama al LLM y persiste los resultados en base de datos.</p>
+      </div>
+      <div class="box">
+        <h4>Capa de inteligencia (Ollama)</h4>
+        <p>Servidor local que ejecuta el modelo de lenguaje. Recibe el historial de conversación y devuelve la respuesta. Completamente desconectado de internet.</p>
+      </div>
+      <div class="box">
+        <h4>Capa de datos (SQLAlchemy)</h4>
+        <p>SQLite en desarrollo, MySQL/MariaDB en producción. El motor lo gestiona SQLAlchemy; el esquema lo instala automáticamente el plugin Moodle al activarse.</p>
+      </div>
+    </div>
+
+    <h3>Flujo de una conversación</h3>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>El alumno escribe un mensaje en el bloque Moodle</h4>
+          <p>El módulo JavaScript recoge el texto y el token JWT que Moodle inyectó al cargar la página.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Petición POST /chat al backend</h4>
+          <p>El JS envía <code>{ message, token, subject }</code> al endpoint <code>/chat</code> de FastAPI.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>FastAPI verifica identidad y límites</h4>
+          <p>Decodifica el JWT para obtener el <code>user_id</code>, cuenta los mensajes del día y rechaza con 429 si supera el límite configurado.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Contexto + llamada a Ollama</h4>
+          <p>Recupera los últimos 10 mensajes del historial, construye el prompt con contexto académico y llama a la API local de Ollama.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Persistencia y respuesta</h4>
+          <p>Guarda el mensaje del usuario y la respuesta del asistente en base de datos. Devuelve la respuesta al navegador junto con una sugerencia de ejercicio si la materia lo permite.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 3. BACKEND ════════════════════════════════ -->
+  <section id="s3">
+    <h2 class="section-title"><span class="num">3</span>Backend — API REST con FastAPI</h2>
+
+    <h3>Estructura del proyecto backend</h3>
+    <div class="filetree">
+<span class="dir">backend/</span>
+├── <span class="file">main.py</span>          <span class="note"># Aplicación FastAPI, CORS, arranque</span>
+├── <span class="file">config.py</span>        <span class="note"># Configuración via variables de entorno (.env)</span>
+├── <span class="file">database.py</span>      <span class="note"># Modelos SQLAlchemy, engine, get_db()</span>
+├── <span class="file">schemas.py</span>       <span class="note"># Modelos Pydantic (validación entrada/salida)</span>
+├── <span class="file">jwt_service.py</span>   <span class="note"># Firma y verificación de tokens JWT</span>
+├── <span class="file">rate_limit.py</span>    <span class="note"># Control del límite diario de mensajes</span>
+├── <span class="file">llm.py</span>           <span class="note"># Cliente httpx para Ollama + prompt del sistema</span>
+├── <span class="file">requirements.txt</span>
+├── <span class="file">.env</span>             <span class="note"># Configuración local (no se sube al repositorio)</span>
+└── <span class="dir">routers/</span>
+    ├── <span class="file">chat.py</span>      <span class="note"># POST /chat</span>
+    ├── <span class="file">history.py</span>   <span class="note"># GET  /history/{user_id}</span>
+    ├── <span class="file">exercise.py</span>  <span class="note"># POST /exercise  y  POST /exercise/answer</span>
+    └── <span class="file">progress.py</span>  <span class="note"># GET  /progress/{user_id}</span>
+    </div>
+
+    <h3>Endpoints de la API</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>Ruta</th>
+            <th>Descripción</th>
+            <th>Errores posibles</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge-method post">POST</span></td>
+            <td><code>/chat</code></td>
+            <td>Envía un mensaje y recibe la respuesta del LLM. Guarda el intercambio en BD.</td>
+            <td>401 (token), 429 (límite), 503 (Ollama)</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method get">GET</span></td>
+            <td><code>/history/{user_id}</code></td>
+            <td>Devuelve todos los mensajes del usuario ordenados por fecha.</td>
+            <td>401 (token), 403 (usuario distinto)</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method post">POST</span></td>
+            <td><code>/exercise</code></td>
+            <td>Genera un ejercicio para la materia indicada usando el LLM.</td>
+            <td>401 (token), 503 (Ollama)</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method post">POST</span></td>
+            <td><code>/exercise/answer</code></td>
+            <td>Evalúa la respuesta del alumno y devuelve corrección detallada.</td>
+            <td>401 (token), 404 (ejercicio), 403 (usuario)</td>
+          </tr>
+          <tr>
+            <td><span class="badge-method get">GET</span></td>
+            <td><code>/progress/{user_id}</code></td>
+            <td>Devuelve estadísticas: mensajes hoy, ejercicios totales, tasa de acierto, desglose por materia.</td>
+            <td>401 (token), 403 (usuario)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Configuración (.env)</h3>
+    <pre><span class="var">JWT_SECRET</span>=<span class="str">clave-secreta-compartida-con-moodle</span>
+<span class="var">DATABASE_URL</span>=<span class="str">sqlite:///./chatbot.db</span>            <span class="cm"># SQLite en dev</span>
+<span class="var">OLLAMA_URL</span>=<span class="str">http://localhost:11434</span>
+<span class="var">OLLAMA_MODEL</span>=<span class="str">llama3</span>
+<span class="var">DAILY_MESSAGE_LIMIT</span>=<span class="num">50</span>
+<span class="var">MAX_HISTORY_MESSAGES</span>=<span class="num">10</span>
+<span class="var">LLM_TIMEOUT</span>=<span class="num">30</span></pre>
+
+    <h3>Prompt del sistema</h3>
+    <p>Cada llamada al LLM incluye un prompt de sistema que condiciona el comportamiento del modelo:</p>
+    <div class="box box-yellow">
+      <p style="font-style:italic;color:#92400e;font-size:.88rem;">
+        "Eres un asistente académico para estudiantes de Bachillerato (16-18 años). Explica los conceptos
+        de forma clara, con ejemplos concretos y lenguaje accesible. Cuando el alumno tenga un error,
+        corrígelo de forma constructiva. Si la pregunta no es académica, redirige amablemente
+        la conversación hacia el estudio."
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 4. BASE DE DATOS ══════════════════════════ -->
+  <section id="s4">
+    <h2 class="section-title"><span class="num">4</span>Modelo de datos — Base de datos</h2>
+
+    <p>
+      El sistema utiliza tres tablas propias dentro de la base de datos de Moodle.
+      El prefijo <code>block_chatbot_</code> sigue la convención de nomenclatura de Moodle
+      para evitar colisiones con otras tablas.
+    </p>
+
+    <h3>block_chatbot_messages</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>INT (PK, auto)</td><td>Identificador único del mensaje</td></tr>
+          <tr><td><code>user_id</code></td><td>INT (índice)</td><td>ID del usuario de Moodle</td></tr>
+          <tr><td><code>role</code></td><td>CHAR(16)</td><td><code>user</code> o <code>assistant</code></td></tr>
+          <tr><td><code>content</code></td><td>TEXT</td><td>Contenido del mensaje</td></tr>
+          <tr><td><code>subject</code></td><td>CHAR(64), nullable</td><td>Materia seleccionada en el momento del mensaje</td></tr>
+          <tr><td><code>timestamp</code></td><td>INT</td><td>Unix timestamp del momento del mensaje</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>block_chatbot_exercises</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>INT (PK, auto)</td><td>Identificador único del ejercicio</td></tr>
+          <tr><td><code>user_id</code></td><td>INT (índice)</td><td>ID del alumno que solicitó el ejercicio</td></tr>
+          <tr><td><code>question</code></td><td>TEXT</td><td>Enunciado generado por el LLM</td></tr>
+          <tr><td><code>answer</code></td><td>TEXT</td><td>Respuesta que dio el alumno</td></tr>
+          <tr><td><code>correct</code></td><td>INT(1), nullable</td><td>1 si correcta, 0 si no, NULL si no respondida</td></tr>
+          <tr><td><code>timestamp</code></td><td>INT</td><td>Unix timestamp</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>block_chatbot_progress</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Campo</th><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>
+          <tr><td><code>id</code></td><td>INT (PK, auto)</td><td>Identificador único</td></tr>
+          <tr><td><code>user_id</code></td><td>INT (índice compuesto)</td><td>ID del alumno</td></tr>
+          <tr><td><code>subject</code></td><td>CHAR(64) (índice compuesto)</td><td>Materia</td></tr>
+          <tr><td><code>topic</code></td><td>CHAR(128)</td><td>Tema concreto dentro de la materia</td></tr>
+          <tr><td><code>count</code></td><td>INT</td><td>Número de veces consultado</td></tr>
+          <tr><td><code>last_seen</code></td><td>INT</td><td>Última vez que se consultó este tema (Unix timestamp)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-blue">
+      <h4>Instalación automática</h4>
+      <p>
+        Las tres tablas se crean automáticamente cuando el administrador de Moodle instala el plugin,
+        gracias al fichero <code>db/install.xml</code> (formato XMLDB de Moodle). No se requiere
+        ninguna intervención manual en la base de datos.
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 5. PLUGIN MOODLE ══════════════════════════ -->
+  <section id="s5">
+    <h2 class="section-title"><span class="num">5</span>Plugin Moodle</h2>
+
+    <h3>Estructura de archivos</h3>
+    <div class="filetree">
+<span class="dir">moodle-plugin/block_chatbot/</span>
+├── <span class="file">block_chatbot.php</span>     <span class="note"># Clase principal del bloque (hereda block_base)</span>
+├── <span class="file">version.php</span>           <span class="note"># Versión y compatibilidad del plugin</span>
+├── <span class="file">settings.php</span>          <span class="note"># Panel de configuración en admin de Moodle</span>
+├── <span class="dir">db/</span>
+│   └── <span class="file">install.xml</span>       <span class="note"># Definición de tablas (XMLDB)</span>
+├── <span class="dir">lang/en/</span>
+│   └── <span class="file">block_chatbot.php</span> <span class="note"># Cadenas de texto internacionalizables</span>
+├── <span class="dir">templates/</span>
+│   └── <span class="file">chat.mustache</span>     <span class="note"># Plantilla HTML del bloque (Mustache)</span>
+└── <span class="dir">amd/src/</span>
+    └── <span class="file">chat.js</span>           <span class="note"># Módulo AMD JavaScript (toda la lógica de UI)</span>
+    </div>
+
+    <h3>Clase principal (block_chatbot.php)</h3>
+    <p>
+      La clase extiende <code>block_base</code> y sobrescribe el método <code>get_content()</code>.
+      Al renderizar el bloque:
+    </p>
+    <ul>
+      <li>Comprueba que el usuario ha iniciado sesión en Moodle (no invitado).</li>
+      <li>Lee la configuración (URL del backend y secreto JWT) desde los ajustes del plugin.</li>
+      <li>Genera un token JWT firmado con el <code>user_id</code> de Moodle y expiración de 1 hora.</li>
+      <li>Inyecta el token, la URL del backend y el ID de usuario en el módulo JavaScript.</li>
+      <li>Renderiza la plantilla Mustache con el HTML del chat.</li>
+    </ul>
+
+    <h3>Módulo AMD JavaScript (chat.js)</h3>
+    <p>
+      Utiliza el sistema de módulos AMD (RequireJS) de Moodle. El módulo exporta una función
+      <code>init(params)</code> que registra todos los listeners de eventos al cargar la página.
+    </p>
+    <div class="grid-2">
+      <div class="box">
+        <h4>Funciones principales</h4>
+        <ul>
+          <li><code>sendMessage()</code> — POST a /chat</li>
+          <li><code>requestExercise()</code> — POST a /exercise</li>
+          <li><code>submitExerciseAnswer()</code> — POST a /exercise/answer</li>
+          <li><code>loadProgress()</code> — GET a /progress/{userId}</li>
+          <li><code>appendMessage(role, text)</code> — renderiza burbuja</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4>Elementos de la interfaz</h4>
+        <ul>
+          <li>Área de mensajes con scroll automático</li>
+          <li>Indicador "..." mientras el LLM responde</li>
+          <li>Burbujas diferenciadas (usuario / asistente)</li>
+          <li>Selector de materia</li>
+          <li>Botón "Practicar ejercicio" (dinámico)</li>
+          <li>Panel de progreso desplegable</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Configuración del administrador</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Parámetro</th><th>Descripción</th><th>Valor por defecto</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>backend_url</code></td>
+            <td>URL base del servidor FastAPI</td>
+            <td><code>http://localhost:8000</code></td>
+          </tr>
+          <tr>
+            <td><code>jwt_secret</code></td>
+            <td>Clave secreta compartida para firmar tokens (campo enmascarado)</td>
+            <td><em>Vacío (obligatorio configurar)</em></td>
+          </tr>
+          <tr>
+            <td><code>daily_limit</code></td>
+            <td>Número máximo de mensajes por usuario al día</td>
+            <td>50</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ 6. SEGURIDAD JWT ══════════════════════════ -->
+  <section id="s6">
+    <h2 class="section-title"><span class="num">6</span>Seguridad y autenticación JWT</h2>
+
+    <p>
+      El sistema no implementa su propio registro de usuarios: reutiliza completamente la sesión
+      de Moodle. La identidad se transmite al backend mediante tokens JWT firmados con el
+      algoritmo <strong>HMAC-SHA256 (HS256)</strong>.
+    </p>
+
+    <h3>Flujo de autenticación</h3>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Moodle autentica al usuario (su mecanismo habitual)</h4>
+          <p>El alumno inicia sesión en Moodle con su usuario y contraseña del centro. No se requiere ningún paso adicional.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>PHP genera un token JWT firmado</h4>
+          <p>Al renderizar el bloque, el servidor PHP crea un JWT con <code>user_id</code>, <code>exp</code> (1 hora) e <code>iat</code>, firmado con el secreto compartido.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>El token viaja al cliente y se adjunta a cada petición</h4>
+          <p>El JS lo incluye en el body o query string de cada llamada al backend. Nunca se almacena en localStorage (vive solo en memoria de la página).</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>FastAPI verifica el token con PyJWT</h4>
+          <p>Si el token es inválido, ha expirado o la firma no coincide, la petición se rechaza con HTTP 401.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Compatibilidad PHP ↔ Python</h3>
+    <p>
+      El token se genera en PHP sin librerías externas y se verifica en Python con PyJWT.
+      La clave es que ambos usen el mismo esquema de codificación base64url (sin padding, con
+      sustitución de <code>+</code>→<code>-</code> y <code>/</code>→<code>_</code>):
+    </p>
+    <pre><span class="cm">// PHP — implementación manual de base64url</span>
+<span class="kw">private function</span> <span class="fn">b64url</span>(<span class="kw">string</span> <span class="var">$data</span>): <span class="kw">string</span> {
+    <span class="kw">return</span> <span class="fn">rtrim</span>(<span class="fn">strtr</span>(<span class="fn">base64_encode</span>(<span class="var">$data</span>), <span class="str">'+/'</span>, <span class="str">'-_'</span>), <span class="str">'='</span>);
+}
+
+<span class="cm"># Python — verificación con PyJWT (estándar)</span>
+<span class="kw">def</span> <span class="fn">verify_jwt</span>(token: <span class="kw">str</span>, secret: <span class="kw">str</span>) -> <span class="kw">dict</span>:
+    <span class="kw">return</span> jwt.<span class="fn">decode</span>(token, secret, algorithms=[<span class="str">"HS256"</span>])</pre>
+
+    <h3>Protección de recursos</h3>
+    <div class="box box-blue">
+      <p>
+        Cada endpoint que devuelve datos de un usuario comprueba que el <code>user_id</code>
+        extraído del token coincide con el identificador de la URL. Así, aunque un alumno
+        obtuviera el token de otro, no podría leer su historial ni su progreso (devuelve HTTP 403).
+      </p>
+    </div>
+  </section>
+
+  <!-- ══ 7. OLLAMA ═════════════════════════════════ -->
+  <section id="s7">
+    <h2 class="section-title"><span class="num">7</span>Modelo de lenguaje — Ollama</h2>
+
+    <p>
+      <strong>Ollama</strong> es un servidor de modelos de lenguaje que corre en la misma red local
+      que el backend. No requiere GPU (aunque mejora con una) y soporta modelos de código abierto
+      como Llama 3 y Mistral.
+    </p>
+
+    <div class="grid-2">
+      <div class="box box-green">
+        <h4>Ventajas del enfoque local</h4>
+        <ul>
+          <li><strong>Privacidad total:</strong> ningún mensaje del alumno sale de la red del centro</li>
+          <li><strong>Sin coste por petición:</strong> no depende de APIs de pago</li>
+          <li><strong>Sin límites de uso:</strong> el throughput lo decide el hardware propio</li>
+          <li><strong>Actualizable:</strong> se puede cambiar el modelo con un solo comando</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4>Modelos compatibles</h4>
+        <ul>
+          <li><code>llama3</code> — Meta Llama 3 8B (recomendado)</li>
+          <li><code>mistral</code> — Mistral 7B</li>
+          <li><code>llama3:70b</code> — versión grande (requiere GPU)</li>
+          <li>Cualquier modelo disponible en ollama.com</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Comunicación con el backend</h3>
+    <p>
+      FastAPI llama a Ollama mediante su API REST usando <code>httpx</code> de forma asíncrona.
+      El timeout es configurable (30 segundos por defecto). Si Ollama no está disponible,
+      el backend responde con HTTP 503 y un mensaje de error claro al usuario.
+    </p>
+    <pre><span class="cm"># Estructura de la petición a Ollama</span>
+{
+  <span class="str">"model"</span>: <span class="str">"llama3"</span>,
+  <span class="str">"stream"</span>: <span class="kw">false</span>,
+  <span class="str">"messages"</span>: [
+    { <span class="str">"role"</span>: <span class="str">"system"</span>,    <span class="str">"content"</span>: <span class="str">"&lt;prompt del sistema&gt;"</span> },
+    { <span class="str">"role"</span>: <span class="str">"user"</span>,      <span class="str">"content"</span>: <span class="str">"¿Cómo se resuelve una derivada?"</span> },
+    { <span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: <span class="str">"La derivada se calcula..."</span> },
+    { <span class="str">"role"</span>: <span class="str">"user"</span>,      <span class="str">"content"</span>: <span class="str">"¿Y con la regla de la cadena?"</span> }
+  ]
+}</pre>
+  </section>
+
+  <!-- ══ 8. PRUEBAS ════════════════════════════════ -->
+  <section id="s8">
+    <h2 class="section-title"><span class="num">8</span>Plan de pruebas</h2>
+
+    <h3>Backend Python — pytest</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Fichero de test</th><th>Nº tests</th><th>Qué se prueba</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>test_jwt_service.py</code></td><td>4</td><td>Firma/verificación correcta, token expirado, secreto incorrecto, token malformado</td></tr>
+          <tr><td><code>test_rate_limit.py</code></td><td>5</td><td>Sin mensajes permite, bajo el límite permite, en el límite bloquea, mensajes del asistente no cuentan, usuarios independientes</td></tr>
+          <tr><td><code>test_chat.py</code></td><td>5</td><td>Token inválido 401, respuesta correcta, materia sin ejercicio no sugiere, rate limit 429, Ollama caído 503</td></tr>
+          <tr><td><code>test_history.py</code></td><td>4</td><td>Historial vacío, mensajes ordenados, usuario incorrecto 403, token inválido 401</td></tr>
+          <tr><td><code>test_progress.py</code></td><td>3</td><td>Sin datos, conteo correcto de ejercicios y mensajes, usuario incorrecto 403</td></tr>
+          <tr><td><code>test_exercise.py</code></td><td>5</td><td>Generación correcta, token inválido, respuesta acertada, respuesta errónea, ejercicio de otro usuario 404</td></tr>
+          <tr><td><code>test_database.py</code></td><td>2</td><td>Creación de tablas, modelo Exercise</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="box box-green" style="margin-bottom:20px">
+      <h4>Resultado: 28 / 28 tests superados (100%)</h4>
+      <p>Los tests no dependen de red ni de Ollama instalado: se usan <code>AsyncMock</code>
+      para simular el LLM y SQLite en memoria para la base de datos.</p>
+    </div>
+
+    <h3>Plugin Moodle — PHPUnit</h3>
+    <p>El fichero <code>tests/phpunit/block_chatbot_test.php</code> cubre:</p>
+    <ul>
+      <li>La función <code>b64url()</code> produce base64url correcto (sin padding, sin <code>+</code> ni <code>/</code>)</li>
+      <li>El token JWT generado tiene exactamente tres partes separadas por puntos</li>
+      <li>El payload contiene el <code>user_id</code> correcto y una expiración futura</li>
+      <li>La firma HMAC-SHA256 es matemáticamente correcta</li>
+      <li>Un usuario invitado recibe el bloque vacío</li>
+      <li>Sin configuración del administrador, el bloque muestra un mensaje de error apropiado</li>
+    </ul>
+
+    <h3>Estrategia de aislamiento</h3>
+    <div class="grid-3">
+      <div class="box">
+        <h4>Fixture autouse</h4>
+        <p>El secreto JWT y el límite diario se parchean en cada test con valores conocidos. No dependen de variables de entorno.</p>
+      </div>
+      <div class="box">
+        <h4>BD efímera</h4>
+        <p>Cada test crea su propia base de datos SQLite en <code>tmp_path</code>. Al terminar el test, se elimina. Los tests no interfieren entre sí.</p>
+      </div>
+      <div class="box">
+        <h4>Ollama simulado</h4>
+        <p><code>AsyncMock</code> sustituye la función <code>call_ollama</code>. Se puede controlar exactamente qué devuelve el modelo en cada caso.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 9. INSTALACIÓN ════════════════════════════ -->
+  <section id="s9">
+    <h2 class="section-title"><span class="num">9</span>Manual de instalación</h2>
+
+    <h3>Requisitos previos</h3>
+    <div class="grid-2">
+      <div class="box">
+        <h4>Software necesario</h4>
+        <ul>
+          <li>Docker Desktop (para el entorno de desarrollo)</li>
+          <li>Python 3.11 o superior</li>
+          <li>Ollama (<a href="https://ollama.com">ollama.com</a>)</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4>Recursos de hardware mínimos</h4>
+        <ul>
+          <li>8 GB de RAM (16 GB recomendados)</li>
+          <li>10 GB de espacio en disco (para el modelo LLM)</li>
+          <li>CPU multinúcleo (GPU opcional pero acelera el modelo)</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Pasos de instalación</h3>
+    <div class="steps">
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Levantar Moodle con Docker</h4>
+          <pre><span class="cm"># Desde la carpeta raíz del proyecto</span>
+docker compose up -d
+<span class="cm"># Moodle disponible en http://localhost:8080</span>
+<span class="cm"># Admin: user=admin / password=admin123</span></pre>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Instalar el plugin en Moodle</h4>
+          <p>Copiar la carpeta <code>moodle-plugin/block_chatbot/</code> al directorio <code>blocks/</code> de la instalación de Moodle, luego acceder a <em>Administración del sitio → Notificaciones</em> y hacer clic en <strong>Actualizar base de datos ahora</strong>.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Configurar el plugin en el panel de administración</h4>
+          <p>Ir a <em>Administración del sitio → Plugins → Bloques → Chatbot Académico</em> y establecer:</p>
+          <ul>
+            <li><strong>URL del backend:</strong> <code>http://localhost:8000</code></li>
+            <li><strong>Secreto JWT:</strong> una cadena aleatoria larga (ej. 32 caracteres)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Instalar dependencias Python y arrancar el backend</h4>
+          <pre><span class="kw">cd</span> chatbot-moodle/backend
+pip install -r requirements.txt
+
+<span class="cm"># Crear .env con el mismo JWT_SECRET configurado en Moodle</span>
+<span class="kw">echo</span> <span class="str">"JWT_SECRET=tu-secreto-aqui"</span> >> .env
+
+uvicorn main:app --host <span class="num">0.0.0.0</span> --port <span class="num">8000</span></pre>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Descargar y arrancar el modelo LLM</h4>
+          <pre>ollama pull llama3       <span class="cm"># Descarga ~4 GB, solo la primera vez</span>
+ollama serve             <span class="cm"># Deja el servidor en ejecución</span></pre>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Añadir el bloque a un curso de Moodle</h4>
+          <p>En cualquier curso: activar <em>Modo de edición → Añadir un bloque → Chatbot Académico</em>. El bloque ya aparece para todos los alumnos matriculados en ese curso.</p>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-n"></div>
+        <div class="step-body">
+          <h4>Verificar la instalación</h4>
+          <pre><span class="cm"># Ejecutar los tests del backend</span>
+<span class="kw">cd</span> chatbot-moodle/backend
+pytest tests/ -v
+<span class="cm"># Resultado esperado: 28 passed</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 10. CONCLUSIONES ══════════════════════════ -->
+  <section id="s10">
+    <h2 class="section-title"><span class="num">10</span>Conclusiones</h2>
+
+    <p>
+      El proyecto ha desarrollado un sistema completo de asistencia académica inteligente
+      que cumple todos los objetivos planteados. Se ha logrado una integración nativa con Moodle
+      que no requiere ningún cambio en los hábitos del alumno ni del profesor.
+    </p>
+
+    <h3>Logros técnicos</h3>
+    <div class="grid-2">
+      <div class="box box-green">
+        <h4>Completado al 100%</h4>
+        <ul>
+          <li>13 tareas de implementación finalizadas</li>
+          <li>20+ ficheros de código creados</li>
+          <li>5 endpoints REST con manejo de errores completo</li>
+          <li>3 tablas de base de datos con instalación automática</li>
+          <li>28 tests automatizados, todos superados</li>
+          <li>Entorno Docker listo para desarrollo</li>
+        </ul>
+      </div>
+      <div class="box box-blue">
+        <h4>Decisiones de diseño destacadas</h4>
+        <ul>
+          <li>JWT generado en PHP sin librerías externas (solo <code>hash_hmac</code>)</li>
+          <li>LLM completamente local: privacidad garantizada</li>
+          <li>Tests aislados con AsyncMock y SQLite en memoria</li>
+          <li>Límite diario configurable por el administrador</li>
+          <li>Interfaz adaptada al dispositivo del alumno</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Posibles mejoras futuras</h3>
+    <ul>
+      <li><strong>Informe para el profesor:</strong> panel de administración con estadísticas de la clase (qué temas generan más dudas, distribución de aciertos).</li>
+      <li><strong>Modo streaming:</strong> mostrar la respuesta del LLM palabra a palabra en lugar de esperar la respuesta completa.</li>
+      <li><strong>Ajuste fino del modelo:</strong> entrenar el LLM con material del temario específico del centro para respuestas más precisas.</li>
+      <li><strong>Exportación de historial:</strong> permitir al alumno descargar su historial de conversación en PDF.</li>
+      <li><strong>Soporte multiidioma:</strong> adaptar el plugin para centros que trabajan en catalán, euskera o gallego.</li>
+    </ul>
+
+    <hr>
+    <div class="box" style="text-align:center">
+      <p style="color:var(--gray);font-size:.88rem;">
+        Proyecto desarrollado por <strong>Jose Aguilar</strong> · Mayo 2026<br>
+        Stack: FastAPI · Python 3.11 · Moodle Plugin PHP 8 · Ollama (Llama3) · SQLAlchemy · PyJWT
+      </p>
+    </div>
+  </section>
+
+</div><!-- /page -->
+
+</body>
+</html>

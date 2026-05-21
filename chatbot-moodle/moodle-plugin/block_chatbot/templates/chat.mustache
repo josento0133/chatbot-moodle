@@ -1,0 +1,45 @@
+<div class="block-chatbot-wrap">
+    <div id="block-chatbot-messages"
+         style="height:280px;overflow-y:auto;border:1px solid #dee2e6;border-radius:4px;padding:8px;background:#fafafa;margin-bottom:8px;">
+        <div class="text-center text-muted" id="block-chatbot-welcome" style="margin-top:80px;font-size:0.9em;">
+            ¡Hola! Soy tu asistente académico.<br>¿En qué puedo ayudarte?
+        </div>
+    </div>
+
+    <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <input id="block-chatbot-input"
+               type="text"
+               class="form-control form-control-sm"
+               placeholder="Escribe tu pregunta..."
+               style="flex:1;" />
+        <button id="block-chatbot-send" class="btn btn-primary btn-sm">Enviar</button>
+    </div>
+
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;">
+        <select id="block-chatbot-subject" class="form-control form-control-sm" style="width:auto;max-width:160px;">
+            <option value="">-- Materia --</option>
+            <option value="Matemáticas">Matemáticas</option>
+            <option value="Física">Física</option>
+            <option value="Química">Química</option>
+            <option value="Biología">Biología</option>
+            <option value="Lengua">Lengua</option>
+            <option value="Literatura">Literatura</option>
+            <option value="Inglés">Inglés</option>
+            <option value="Historia">Historia</option>
+            <option value="Ciencias Sociales">Ciencias Sociales</option>
+        </select>
+        <button id="block-chatbot-exercise-btn"
+                class="btn btn-outline-secondary btn-sm"
+                style="display:none;">
+            Practicar ejercicio
+        </button>
+        <button id="block-chatbot-progress-toggle"
+                class="btn btn-outline-info btn-sm">
+            Mi progreso
+        </button>
+    </div>
+
+    <div id="block-chatbot-progress-panel"
+         style="display:none;padding:8px;border:1px solid #dee2e6;border-radius:4px;background:#fff;font-size:0.85em;">
+    </div>
+</div>
