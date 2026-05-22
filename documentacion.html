@@ -359,7 +359,7 @@
     <div class="badge">Proyecto de Desarrollo de Aplicaciones Web</div>
     <h1>Chatbot Académico<br>integrado en Moodle</h1>
     <p class="subtitle">
-      Sistema de asistencia académica inteligente para estudiantes de Bachillerato,
+      Sistema de asistencia académica inteligente para estudiantes de cualquier nivel educativo,
       implementado como plugin nativo de Moodle con backend FastAPI y modelo de lenguaje local.
     </p>
     <div class="cover-meta">
@@ -393,7 +393,7 @@
 
     <h3>Contexto</h3>
     <p>
-      Los estudiantes de Bachillerato (16-18 años) necesitan apoyo académico más allá del horario lectivo.
+      Los estudiantes de cualquier edad y nivel educativo necesitan apoyo académico más allá del horario lectivo.
       Las dudas surgen mientras estudian por la noche o el fin de semana, y esperar al día siguiente
       para preguntar al profesor rompe el ritmo de aprendizaje.
     </p>
@@ -427,7 +427,7 @@
 
     <h3>Alcance</h3>
     <p>
-      El sistema cubre todas las materias de Bachillerato: Matemáticas, Física, Química, Biología,
+      El sistema cubre las materias académicas más habituales: Matemáticas, Física, Química, Biología,
       Lengua, Literatura, Historia, Inglés y Ciencias Sociales. Los ejercicios prácticos con corrección
       automática se limitan a las materias de ciencias (donde la estructura de problema-solución es más
       clara para el modelo).
@@ -594,7 +594,7 @@
     <p>Cada llamada al LLM incluye un prompt de sistema que condiciona el comportamiento del modelo:</p>
     <div class="box box-yellow">
       <p style="font-style:italic;color:#92400e;font-size:.88rem;">
-        "Eres un asistente académico para estudiantes de Bachillerato (16-18 años). Explica los conceptos
+        "Eres un asistente académico para estudiantes de cualquier nivel educativo. Explica los conceptos
         de forma clara, con ejemplos concretos y lenguaje accesible. Cuando el alumno tenga un error,
         corrígelo de forma constructiva. Si la pregunta no es académica, redirige amablemente
         la conversación hacia el estudio."
@@ -957,17 +957,17 @@
         <div class="step-n"></div>
         <div class="step-body">
           <h4>Levantar Moodle con Docker</h4>
-          <pre><span class="cm"># Desde la carpeta raíz del proyecto</span>
+          <pre><span class="cm"># Desde la carpeta chatbot-moodle/</span>
 docker compose up -d
 <span class="cm"># Moodle disponible en http://localhost:8080</span>
-<span class="cm"># Admin: user=admin / password=admin123</span></pre>
+<span class="cm"># Admin: user=admin / password=Admin1234!</span></pre>
         </div>
       </div>
       <div class="step-item">
         <div class="step-n"></div>
         <div class="step-body">
           <h4>Instalar el plugin en Moodle</h4>
-          <p>Copiar la carpeta <code>moodle-plugin/block_chatbot/</code> al directorio <code>blocks/</code> de la instalación de Moodle, luego acceder a <em>Administración del sitio → Notificaciones</em> y hacer clic en <strong>Actualizar base de datos ahora</strong>.</p>
+          <p>El <code>docker-compose.yml</code> ya monta la carpeta <code>moodle-plugin/block_chatbot/</code> dentro del contenedor como un volumen. Basta con iniciar sesión como administrador: Moodle detecta el bloque nuevo y muestra la página de instalación. Hacer clic en <strong>Actualizar base de datos ahora</strong> para crear las tablas.</p>
         </div>
       </div>
       <div class="step-item">

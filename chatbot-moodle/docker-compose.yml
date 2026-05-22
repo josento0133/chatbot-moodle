@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   db:
     image: mysql:8.0
@@ -13,22 +12,28 @@ services:
       - moodle_db:/var/lib/mysql
 
   moodle:
-    image: bitnami/moodle:4
+    image: erseco/alpine-moodle:v4.5.11
     environment:
-      MOODLE_DATABASE_HOST: db
-      MOODLE_DATABASE_NAME: moodle
-      MOODLE_DATABASE_USER: moodle
-      MOODLE_DATABASE_PASSWORD: moodlepass
+      DB_TYPE: mysqli
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: moodle
+      DB_USER: moodle
+      DB_PASS: moodlepass
+      SITE_URL: http://localhost:8080
       MOODLE_USERNAME: admin
       MOODLE_PASSWORD: Admin1234!
+      MOODLE_EMAIL: admin@example.com
     ports:
       - "8080:8080"
     volumes:
-      - moodle_data:/bitnami/moodle
-      - ./moodle-plugin/block_chatbot:/bitnami/moodle/blocks/chatbot
+      - moodle_data:/var/www/moodledata
+      - moodle_html:/var/www/html
+      - ./moodle-plugin/block_chatbot:/var/www/html/blocks/chatbot
     depends_on:
       - db
 
 volumes:
   moodle_db:
   moodle_data:
+  moodle_html:

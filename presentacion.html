@@ -387,7 +387,7 @@
   <div class="slide bg-hero active">
     <div class="tag">Proyecto Final · 2026</div>
     <h1>Chatbot Académico<br>para Moodle</h1>
-    <p class="subtitle">Asistente inteligente integrado en la plataforma Moodle para apoyo académico en Bachillerato (16-18 años), con LLM local, historial por usuario y seguimiento de progreso.</p>
+    <p class="subtitle">Asistente inteligente integrado en la plataforma Moodle para apoyo académico a estudiantes de cualquier edad y nivel educativo, con LLM local, historial por usuario y seguimiento de progreso.</p>
     <div class="pills" style="margin-top:32px">
       <span class="pill pill-blue">FastAPI · Python 3.11</span>
       <span class="pill pill-purple">Moodle Plugin PHP 8</span>
@@ -405,7 +405,7 @@
     <div class="grid grid-2" style="max-width:800px">
       <div class="card">
         <span class="icon">🎓</span>
-        <h3>Alumnos de Bachillerato</h3>
+        <h3>Estudiantes de cualquier nivel</h3>
         <p>Necesitan resolver dudas académicas fuera del horario lectivo sin esperar al día siguiente.</p>
       </div>
       <div class="card">
@@ -426,7 +426,26 @@
     </div>
   </div>
 
-  <!-- ③ ARQUITECTURA -->
+  <!-- ③ OBJETIVOS -->
+  <div class="slide bg-purple">
+    <div class="tag">Objetivos</div>
+    <h2>¿Qué se quiere conseguir?</h2>
+    <div class="divider"></div>
+    <div class="card" style="max-width:760px; margin-bottom:18px; border-color:#a78bfa55">
+      <h3 style="color:#c4b5fd">🎯 Objetivo general</h3>
+      <p style="font-size:.92rem; color:#cbd5e1">Desarrollar e integrar un asistente conversacional basado en IA dentro de Moodle que ofrezca apoyo académico autónomo a estudiantes de cualquier edad y nivel educativo, garantizando en todo momento la privacidad de sus datos.</p>
+    </div>
+    <div class="grid grid-2" style="max-width:820px">
+      <div class="card"><p>✓ Integrarlo como plugin nativo de Moodle, sin apps externas ni nuevos logins</p></div>
+      <div class="card"><p>✓ Ejecutar el modelo LLM en local para que ningún dato del alumno salga del centro</p></div>
+      <div class="card"><p>✓ Autenticar de forma segura Moodle ↔ backend mediante JWT</p></div>
+      <div class="card"><p>✓ Persistir el historial de conversación y el progreso de cada usuario</p></div>
+      <div class="card"><p>✓ Generar y corregir ejercicios de práctica automáticamente</p></div>
+      <div class="card"><p>✓ Controlar el uso con límites diarios y asegurar la calidad con tests automatizados</p></div>
+    </div>
+  </div>
+
+  <!-- ④ ARQUITECTURA -->
   <div class="slide bg-blue">
     <div class="tag">Arquitectura</div>
     <h2>Visión general del sistema</h2>
@@ -465,7 +484,24 @@
     <p class="subtitle" style="margin-top:20px">El bloque Moodle autentica al usuario y genera un token JWT. El frontend AMD envía ese token a FastAPI en cada petición. FastAPI verifica el token, gestiona la lógica y consulta al LLM local.</p>
   </div>
 
-  <!-- ④ STACK TECNOLÓGICO -->
+  <!-- ⑤ FLUJO DE UNA PETICIÓN -->
+  <div class="slide bg-green">
+    <div class="tag">Flujo interno</div>
+    <h2>Ciclo de vida de un mensaje</h2>
+    <div class="divider"></div>
+    <div class="steps" style="max-width:760px">
+      <div class="step"><div class="step-num">1</div><div class="step-body"><h4>El alumno escribe</h4><p>Pulsa Enviar en el bloque; <code>chat.js</code> captura el texto y la materia seleccionada.</p></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Petición HTTP</h4><p>El navegador envía <code>POST /chat</code> con el token JWT y el mensaje en el cuerpo.</p></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-body"><h4>Verificación del token</h4><p>FastAPI valida la firma HS256 y extrae el <code>user_id</code>. Token inválido → error 401.</p></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-body"><h4>Control de límite diario</h4><p>Cuenta los mensajes del usuario hoy. Si supera el límite → error 429.</p></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-body"><h4>Recuperación de contexto</h4><p>Lee los últimos 10 mensajes del historial desde la base de datos.</p></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-body"><h4>Consulta al LLM</h4><p>Envía system prompt + contexto + pregunta a Ollama. Si Ollama no responde → error 503.</p></div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-body"><h4>Persistencia</h4><p>Guarda pregunta y respuesta en la tabla <code>block_chatbot_messages</code>.</p></div></div>
+      <div class="step"><div class="step-num">8</div><div class="step-body"><h4>Respuesta al alumno</h4><p>Devuelve un JSON; <code>chat.js</code> lo pinta en una burbuja en el chat.</p></div></div>
+    </div>
+  </div>
+
+  <!-- ⑥ STACK TECNOLÓGICO -->
   <div class="slide bg-dark">
     <div class="tag">Stack tecnológico</div>
     <h2>Tecnologías utilizadas</h2>
@@ -519,7 +555,7 @@
         <h3>Infraestructura</h3>
         <ul>
           <li>Docker Compose</li>
-          <li>bitnami/moodle:4</li>
+          <li>erseco/alpine-moodle (Moodle 4.5)</li>
           <li>MySQL 8 container</li>
           <li>uvicorn ASGI server</li>
         </ul>
@@ -538,7 +574,46 @@
     </div>
   </div>
 
-  <!-- ⑤ FUNCIONALIDADES -->
+  <!-- ⑦ JUSTIFICACIÓN TÉCNICA -->
+  <div class="slide bg-orange">
+    <div class="tag">Decisiones de diseño</div>
+    <h2>¿Por qué estas tecnologías?</h2>
+    <div class="divider"></div>
+    <div class="grid grid-3" style="max-width:870px">
+      <div class="card">
+        <span class="icon">⚡</span>
+        <h3>¿Por qué FastAPI?</h3>
+        <p>Asíncrono nativo: espera al LLM sin bloquear. Validación automática con Pydantic y documentación OpenAPI generada sola.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔒</span>
+        <h3>¿Por qué LLM local?</h3>
+        <p>Los datos de menores no salen del centro (RGPD). Sin coste por petición y sin dependencia de internet.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🧩</span>
+        <h3>¿Por qué un bloque?</h3>
+        <p>El plugin de tipo bloque se inserta en cualquier página de Moodle (curso, dashboard) sin modificar el núcleo.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔑</span>
+        <h3>¿Por qué JWT?</h3>
+        <p>Stateless: el backend confía en Moodle con un secreto compartido, sin consultar la base de datos de Moodle.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🗄️</span>
+        <h3>¿Por qué SQLite + MySQL?</h3>
+        <p>SQLite, cero configuración para desarrollo y tests. MySQL en producción: es el motor que ya usa Moodle.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🐳</span>
+        <h3>¿Por qué Docker?</h3>
+        <p>Entorno reproducible e idéntico en cualquier máquina; despliegue de Moodle + base de datos en un solo comando.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑧ FUNCIONALIDADES -->
   <div class="slide bg-green">
     <div class="tag">Funcionalidades</div>
     <h2>¿Qué puede hacer el asistente?</h2>
@@ -547,7 +622,7 @@
       <div class="card">
         <span class="icon">💬</span>
         <h3>Chat de dudas</h3>
-        <p>El alumno escribe su pregunta y recibe una respuesta adaptada a Bachillerato en segundos. El historial persiste entre sesiones (últimos 10 mensajes de contexto).</p>
+        <p>El alumno escribe su pregunta y recibe una respuesta adaptada a su nivel en segundos. El historial persiste entre sesiones (últimos 10 mensajes de contexto).</p>
       </div>
       <div class="card">
         <span class="icon">📝</span>
@@ -576,7 +651,7 @@
     </div>
   </div>
 
-  <!-- ⑥ BASE DE DATOS -->
+  <!-- ⑨ BASE DE DATOS -->
   <div class="slide bg-dark">
     <div class="tag">Base de datos</div>
     <h2>Tres tablas en Moodle</h2>
@@ -610,7 +685,7 @@
     <p class="subtitle" style="margin-top:24px">Las tablas se instalan automáticamente vía <strong style="color:#60a5fa">install.xml</strong> (XMLDB) al añadir el plugin. El motor de base de datos lo hereda Moodle: SQLite en dev, MySQL/MariaDB en prod.</p>
   </div>
 
-  <!-- ⑦ API ENDPOINTS -->
+  <!-- ⑩ API ENDPOINTS -->
   <div class="slide bg-purple">
     <div class="tag">API REST · FastAPI</div>
     <h2>Endpoints del backend</h2>
@@ -660,7 +735,7 @@
     </div>
   </div>
 
-  <!-- ⑧ SEGURIDAD JWT -->
+  <!-- ⑪ SEGURIDAD JWT -->
   <div class="slide bg-dark">
     <div class="tag">Seguridad</div>
     <h2>Autenticación JWT HS256</h2>
@@ -694,7 +769,7 @@
     </div>
   </div>
 
-  <!-- ⑨ PLUGIN MOODLE -->
+  <!-- ⑫ PLUGIN MOODLE -->
   <div class="slide bg-orange">
     <div class="tag">Plugin Moodle</div>
     <h2>Estructura del bloque PHP</h2>
@@ -748,7 +823,7 @@
     </div>
   </div>
 
-  <!-- ⑩ TESTS -->
+  <!-- ⑬ TESTS -->
   <div class="slide bg-dark">
     <div class="tag">Quality Assurance</div>
     <h2>Suite de tests</h2>
@@ -799,7 +874,7 @@
     </div>
   </div>
 
-  <!-- ⑪ DESPLIEGUE -->
+  <!-- ⑭ DESPLIEGUE -->
   <div class="slide bg-blue">
     <div class="tag">Despliegue</div>
     <h2>Poner en marcha el sistema</h2>
@@ -809,14 +884,14 @@
         <div class="step-num">1</div>
         <div class="step-body">
           <h4>Levantar Moodle + MySQL con Docker</h4>
-          <p><code style="color:#a5d6ff">docker compose up -d</code> — arranca Moodle 4 en localhost:8080 con MySQL 8</p>
+          <p><code style="color:#a5d6ff">docker compose up -d</code> — arranca Moodle 4.5 en localhost:8080 con MySQL 8; el plugin ya se monta como volumen</p>
         </div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
         <div class="step-body">
           <h4>Instalar el plugin en Moodle</h4>
-          <p>Copiar <code style="color:#a5d6ff">moodle-plugin/block_chatbot/</code> a <code style="color:#a5d6ff">moodle/blocks/</code> → admin → notificaciones → instalar</p>
+          <p>Iniciar sesión como administrador → Moodle detecta el bloque y muestra la página de instalación → confirmar (crea las 3 tablas)</p>
         </div>
       </div>
       <div class="step">
@@ -850,14 +925,281 @@
     </div>
   </div>
 
-  <!-- ⑫ RESUMEN FINAL -->
+  <!-- ⑮ PRODUCCIÓN — ARQUITECTURA -->
+  <div class="slide bg-purple">
+    <div class="tag">Despliegue real · Instituto</div>
+    <h2>Arquitectura en un servidor Linux</h2>
+    <div class="divider"></div>
+    <div class="arch">
+      <div class="arch-box" style="border-color:#a78bfa44">
+        🧑‍🎓 Alumno
+        <small>Navegador · HTTPS</small>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="border-color:#60a5fa44">
+        🔀 Nginx
+        <small>Proxy inverso · TLS</small>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="border-color:#34d39944">
+        🧩 Moodle
+        <small>Apache · PHP 8</small>
+      </div>
+    </div>
+    <div class="arch" style="margin-top:12px">
+      <div class="arch-box" style="border-color:#fb923c44; min-width:140px">
+        ⚡ FastAPI
+        <small>systemd · puerto 8000</small>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-box" style="border-color:#f8717144; min-width:140px">
+        🤖 Ollama
+        <small>systemd · puerto 11434</small>
+      </div>
+      <div class="arch-arrow">·····</div>
+      <div class="arch-box" style="border-color:#64748b44; min-width:140px">
+        🗄️ MySQL
+        <small>BD compartida con Moodle</small>
+      </div>
+    </div>
+    <div class="grid grid-3" style="max-width:820px; margin-top:16px">
+      <div class="card">
+        <h3>Plugin en Moodle</h3>
+        <p>ZIP subido desde el panel de admin, o <code>scp</code> directo a <code>/var/www/moodle/blocks/chatbot/</code>.</p>
+      </div>
+      <div class="card">
+        <h3>Backend y Ollama</h3>
+        <p>Ambos corren como servicios <strong>systemd</strong>: arranque automático y reinicio si caen.</p>
+      </div>
+      <div class="card">
+        <h3>Sin Docker en producción</h3>
+        <p>Los servicios corren nativos en Linux, más eficiente que contenedores para uso 24/7.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑯ PRODUCCIÓN — SYSTEMD -->
+  <div class="slide bg-dark">
+    <div class="tag">Administración del sistema</div>
+    <h2>Backend como servicio del sistema</h2>
+    <div class="divider"></div>
+    <div class="code-block" style="max-width:820px; margin-bottom:16px">
+<span class="cm"># /etc/systemd/system/chatbot-backend.service</span>
+[Unit]
+<span class="kw">Description</span>=Chatbot Académico Backend
+<span class="kw">After</span>=network.target
+
+[Service]
+<span class="kw">User</span>=www-data
+<span class="kw">WorkingDirectory</span>=/opt/chatbot/backend
+<span class="kw">EnvironmentFile</span>=/opt/chatbot/backend/.env
+<span class="kw">ExecStart</span>=/opt/chatbot/backend/venv/bin/uvicorn main:app --host <span class="num">127.0.0.1</span> --port <span class="num">8000</span>
+<span class="kw">Restart</span>=always
+
+[Install]
+<span class="kw">WantedBy</span>=multi-user.target</div>
+    <div class="grid grid-3" style="max-width:820px">
+      <div class="card">
+        <h3>Activar el servicio</h3>
+        <p><code>systemctl enable --now chatbot-backend</code><br>Arranca con el servidor y se reinicia automáticamente si cae.</p>
+      </div>
+      <div class="card">
+        <h3>Ollama como servicio</h3>
+        <p>El instalador oficial crea su propia unidad systemd. Solo hace falta <code>systemctl enable ollama</code>.</p>
+      </div>
+      <div class="card">
+        <h3>Logs del backend</h3>
+        <p><code>journalctl -u chatbot-backend -f</code> — seguimiento de logs en tiempo real, igual que cualquier servicio del sistema.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑰ PRODUCCIÓN — NGINX -->
+  <div class="slide bg-blue">
+    <div class="tag">Proxy inverso · HTTPS</div>
+    <h2>Nginx: mismo dominio, cero CORS</h2>
+    <div class="divider"></div>
+    <div class="code-block" style="max-width:820px; margin-bottom:16px">
+<span class="cm"># /etc/nginx/sites-available/moodle</span>
+server {
+    listen <span class="num">443</span> ssl;
+    server_name <span class="str">moodle.instituto.es</span>;
+
+    ssl_certificate     /etc/letsencrypt/live/moodle.instituto.es/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/moodle.instituto.es/privkey.pem;
+
+    <span class="cm"># Moodle (PHP-FPM o Apache)</span>
+    location / { ... }
+
+    <span class="cm"># Chatbot API — misma URL, sin CORS</span>
+    location /chatbot-api/ {
+        proxy_pass         http://<span class="num">127.0.0.1</span>:<span class="num">8000</span>/;
+        proxy_read_timeout <span class="num">120</span>s;
+    }
+}</div>
+    <div class="grid grid-2" style="max-width:820px">
+      <div class="card">
+        <h3>¿Por qué el proxy inverso?</h3>
+        <p>El JS del alumno corre bajo <code>https://moodle.instituto.es</code>. Si el backend tuviera un dominio o puerto diferente, el navegador bloquearía la petición por política CORS. Al exponerlo como <code>/chatbot-api/</code> del mismo dominio, el problema desaparece.</p>
+      </div>
+      <div class="card">
+        <h3>Certificado TLS</h3>
+        <p>Se genera gratis con <strong>Let's Encrypt</strong> (<code>certbot --nginx</code>) o se instala el certificado del propio centro educativo. El campo <code>backend_url</code> del plugin se fija a <code>https://moodle.instituto.es/chatbot-api</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑱ REQUISITOS Y COSTES -->
+  <div class="slide bg-dark">
+    <div class="tag">Requisitos y costes</div>
+    <h2>Despliegue en el centro educativo</h2>
+    <div class="divider"></div>
+    <div class="grid grid-2" style="max-width:820px; margin-bottom:18px">
+      <div class="card">
+        <span class="icon">🖥️</span>
+        <h3>Requisitos hardware</h3>
+        <ul>
+          <li>CPU: 4+ núcleos (el LLM corre en CPU, sin GPU obligatoria)</li>
+          <li>RAM: 8 GB mínimo · 16 GB recomendado</li>
+          <li>Disco: ~10 GB (modelo + Moodle + base de datos)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="icon">📦</span>
+        <h3>Requisitos software</h3>
+        <ul>
+          <li>Linux con Docker + Docker Compose</li>
+          <li>Python 3.11 o superior</li>
+          <li>Ollama con un modelo descargado</li>
+        </ul>
+      </div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Concepto</th><th>On-premise (este proyecto)</th><th>API en la nube (GPT-4)</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Coste por petición</td><td>0 €</td><td>~0,01 – 0,03 €</td></tr>
+        <tr><td>Coste mensual (~200 alumnos)</td><td>0 € · solo electricidad</td><td>~150 – 300 €/mes</td></tr>
+        <tr><td>Privacidad de datos</td><td>Total · no salen del centro</td><td>Datos enviados a un tercero</td></tr>
+        <tr><td>Inversión inicial</td><td>Servidor ~600 – 1000 € (una vez)</td><td>0 €</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ⑲ DEMO -->
+  <div class="slide bg-green">
+    <div class="tag">Demostración en vivo</div>
+    <h2>Demo del sistema</h2>
+    <div class="divider"></div>
+    <div class="steps" style="max-width:620px">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h4>Chat de dudas</h4>
+          <p>Pregunta académica → respuesta del LLM adaptada al nivel del alumno con historial de contexto.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h4>Generación de ejercicio</h4>
+          <p>Seleccionar materia → el asistente genera una pregunta estructurada con su solución.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h4>Corrección automática</h4>
+          <p>El alumno responde → el LLM evalúa con SI/NO y explica el razonamiento correcto.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <h4>Panel de progreso</h4>
+          <p>Mensajes hoy · ejercicios · % acierto · desglose por materia.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑳ DIFICULTADES -->
+  <div class="slide bg-orange">
+    <div class="tag">Retos técnicos</div>
+    <h2>Dificultades encontradas</h2>
+    <div class="divider"></div>
+    <div class="grid grid-2" style="max-width:820px">
+      <div class="card">
+        <span class="icon">🔑</span>
+        <h3>JWT cross-language</h3>
+        <p>Moodle genera el token en PHP con <code>hash_hmac</code> y base64url manual; Python lo verifica con PyJWT. Fue necesario alinear exactamente el encoding para que las firmas coincidieran.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🤖</span>
+        <h3>Parseo de JSON del LLM</h3>
+        <p>Los modelos LLM no siempre devuelven JSON puro — añaden texto explicativo. Se resolvió con una expresión regular que extrae el primer objeto JSON válido de la respuesta.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🧩</span>
+        <h3>Sistema AMD de Moodle</h3>
+        <p>Moodle usa RequireJS (AMD) para cargar JavaScript. Fue necesario seguir la convención <code>amd/src/</code> y pasar los parámetros de configuración desde PHP sin romper el ciclo de vida del módulo.</p>
+      </div>
+      <div class="card">
+        <span class="icon">⚗️</span>
+        <h3>Tests asíncronos</h3>
+        <p>FastAPI usa <code>async/await</code> con httpx. Configurar <code>pytest-asyncio</code> con <code>AsyncMock</code> para simular Ollama sin red real requirió ajustar el event loop en cada fixture.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 21. MEJORAS FUTURAS -->
+  <div class="slide bg-purple">
+    <div class="tag">Trabajo futuro</div>
+    <h2>Líneas de mejora</h2>
+    <div class="divider"></div>
+    <div class="grid grid-3" style="max-width:860px">
+      <div class="card">
+        <span class="icon">🐳</span>
+        <h3>Ollama en Docker</h3>
+        <p>Añadir el servicio Ollama al <code>docker-compose.yml</code> para un arranque completamente automatizado con un solo comando.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🔒</span>
+        <h3>HTTPS + Nginx</h3>
+        <p>Añadir un reverse proxy Nginx con certificado TLS (Let's Encrypt) para despliegue seguro en red del centro.</p>
+      </div>
+      <div class="card">
+        <span class="icon">👩‍🏫</span>
+        <h3>Panel del profesor</h3>
+        <p>Dashboard agregado para que el docente vea qué temas consulta más el grupo, sin acceder a conversaciones individuales.</p>
+      </div>
+      <div class="card">
+        <span class="icon">⚡</span>
+        <h3>Streaming de respuestas</h3>
+        <p>Activar el modo <code>stream: true</code> de Ollama para mostrar la respuesta token a token, mejorando la experiencia de usuario.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🌐</span>
+        <h3>Soporte multiidioma</h3>
+        <p>Ampliar las cadenas de idioma del plugin para inglés, catalán y euskera siguiendo el sistema de localización de Moodle.</p>
+      </div>
+      <div class="card">
+        <span class="icon">🧠</span>
+        <h3>Selección de modelo</h3>
+        <p>Permitir al administrador elegir el modelo LLM desde el panel de Moodle: Llama3, Mistral, Phi-3, según la potencia del servidor.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 22. RESUMEN FINAL -->
   <div class="slide bg-hero">
     <div class="tag">Resumen</div>
     <h1>Proyecto completado</h1>
     <div class="divider"></div>
     <div class="stat-row" style="margin-bottom:32px">
-      <div class="stat"><div class="num">13</div><div class="lbl">tareas implementadas</div></div>
-      <div class="stat"><div class="num">20+</div><div class="lbl">archivos creados</div></div>
+      <div class="stat"><div class="num">38</div><div class="lbl">tests totales</div></div>
+      <div class="stat"><div class="num">0€</div><div class="lbl">coste de API</div></div>
       <div class="stat"><div class="num">5</div><div class="lbl">endpoints REST</div></div>
       <div class="stat"><div class="num">3</div><div class="lbl">tablas en BD</div></div>
     </div>
@@ -879,7 +1221,7 @@
 </div><!-- /deck -->
 
 <!-- ── Navigation ──────────────────────────────────── -->
-<div class="slide-counter" id="counter">1 / 12</div>
+<div class="slide-counter" id="counter">1 / 22</div>
 
 <div class="nav">
   <button class="nav-btn" id="prev" onclick="go(-1)" disabled>&#8592;</button>

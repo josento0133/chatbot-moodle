@@ -17,5 +17,4 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Moodle AMD build output
-chatbot-moodle/moodle-plugin/block_chatbot/amd/build/
+# Moodle AMD build output (incluido intencionadamente — no hay pipeline grunt)
